@@ -229,7 +229,7 @@ void write_to_data_object()
     std::array<char, 4_Mb> buffer{}; // Buffer full of data.
 
     // This is the fastest way to write data into iRODS via the new stream API.
-    // Data pushed through the read/write functions is unformatted as written as is.
+    // Bytes written this way are stored directly in the buffer as is.
     out.write(buffer.data(), buffer.size());
 
     // This will also write data into the data object. This is slower than the previous method
@@ -256,7 +256,7 @@ void read_from_data_object()
     std::array<char, 4_Mb> buffer{}; // Buffer to hold data.
 
     // This is the fastest way to write data into iRODS via the new stream API.
-    // Data pushed through the read/write functions is unformatted as written as is.
+    // Bytes read this way are stored directly in the buffer as is.
     in.read(buffer.data(), buffer.size());
 
     // Read a single character sequence into "word".
