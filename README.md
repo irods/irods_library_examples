@@ -123,7 +123,7 @@ Here are some helpful links:
 - [iRODS Filesystem Headers](https://github.com/irods/irods/tree/4.2.6/lib/filesystem/include/filesystem)
 - [Most commonly used functions](https://github.com/irods/irods/tree/4.2.6/lib/filesystem/include/filesystem/filesystem.hpp)
 ```c++
-// If you are writing server-side code, and wish to enable the server-side API, you must
+// If you are writing server-side code and wish to enable the server-side API, you must
 // define the following macro before including the library.
 //
 //    IRODS_FILESYSTEM_ENABLE_SERVER_SIDE_API
@@ -192,7 +192,7 @@ Demonstrates how to use `dstream` and `default_transport` to read and write data
 
 // Defines the default transport mechanism for transporting bytes via the iRODS protocol.
 //
-// If you are writing server-side code, and wish to enable the server-side API, you must
+// If you are writing server-side code and wish to enable the server-side API, you must
 // define the following macro before including the transport library following this comment.
 //
 //     IRODS_IO_TRANSPORT_ENABLE_SERVER_SIDE_API
