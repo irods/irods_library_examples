@@ -105,7 +105,7 @@ void schedule_task_on_thread_pool()
     // This is just like "post" except, if the current thread belongs to the thread pool, then
     // the task is executed directly inside of the call to "dispatch".
     irods::thread_pool::dispatch(pool, [] {
-        // Do science later!
+        // Do science!
     });
 
     // Wait until ALL tasks have completed.
