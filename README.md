@@ -69,20 +69,19 @@ void init_connection_pool()
 
 ## iRODS Thread pool
 Demonstrates how to use `irods::thread_pool`.
-`irods::thread_pool` accepts any object that can be invoked like a function.
 ```c++
 #include <irods/thread_pool.hpp>
 
 void schedule_task_on_thread_pool()
 {
     // Creates a thread pool with 4 threads.
-    // iRODS thread pool will never launch more than std::thread::hardware_concurrency() threads.
+    // iRODS thread pool will never launch more than "std::thread::hardware_concurrency()" threads.
     irods::thread_pool pool{4};
 
     // This is one way to schedule a task for execution
-    // `irods::thread_pool::defer` schedules the task on the thread pool. If the current thread
+    // "irods::thread_pool::defer" schedules the task on the thread pool. If the current thread
     // belongs to the thread pool, then the task is scheduled after the current thread returns and
-    // control is returned back to the thread pool. The task is never run inside of the `defer` call.
+    // control is returned back to the thread pool. The task is never run inside of the "defer" call.
     irods::thread_pool::defer(pool, [] {
         // Do science later!
     });
@@ -98,13 +97,13 @@ void schedule_task_on_thread_pool()
 
     scientific_task task;
 
-    // This is just like `defer` except the task is scheduled immediately. The task is never
-    // executed inside of the `post` call.
+    // This is just like "defer" except the task is scheduled immediately. The task is never
+    // executed inside of the "post" call.
     irods::thread_pool::post(pool, task);
 
     // Only available in 4.3.0.
-    // This is just like `post` except, if the current thread belongs to the thread pool, then
-    // the task is executed directly inside of the call to `dispatch`.
+    // This is just like "post" except, if the current thread belongs to the thread pool, then
+    // the task is executed directly inside of the call to "dispatch".
     irods::thread_pool::dispatch(pool, [] {
         // Do science later!
     });
