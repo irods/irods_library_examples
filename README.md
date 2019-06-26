@@ -133,6 +133,12 @@ Here are some helpful links:
 
 void iterating_over_collections()
 {
+    // IMPORTANT!!!
+    // ~~~~~~~~~~~~
+    // Notice that this library exists under the "experimental" namespace.
+    // This is important if you're considering using this library. It means that any
+    // library under this namespace could change in the future. Changes are likely
+    // to only occur based on feedback from the community.
     namespace fs = irods::experimental::filesystem;
 
     // iRODS Filesystem has two namespaces, client and server.
@@ -148,7 +154,8 @@ void iterating_over_collections()
             // Do something with the collection entry.
         }
 
-        // To recursively iterate over a collection and all of it's children, use a recursive iterator.
+        // To recursively iterate over a collection and all of it's children, use a
+        // recursive iterator.
         for (auto&& e : fs::client::recursive_collection_iterator{conn, "/path/to/collection"}) {
             // Do something with the collection entry.
         }
@@ -157,9 +164,11 @@ void iterating_over_collections()
         // subsequent operations on the copy, such as iterating to the next entry, will
         // be visible to the original iterator.
 
-        // ------------------------- //
-
-        // Let's try something new. How about getting the size of a data object.
+        //
+        // Let's try something new.
+        //
+        
+        // How about getting the size of a data object.
         auto size = fs::client::data_object_size(conn, "/path/to/data_object");
 
         // Or checking if an object exists.
@@ -187,6 +196,12 @@ Demonstrates how to use `dstream` and `default_transport` to read and write data
 
 void write_to_data_object()
 {
+    // IMPORTANT!!!
+    // ~~~~~~~~~~~~
+    // Notice that this library exists under the "experimental" namespace.
+    // This is important if you're considering using this library. It means that any
+    // library under this namespace could change in the future. Changes are likely
+    // to only occur based on feedback from the community.
     namespace io = irods::experimental::io;
 
     auto conn = // Our connection to iRODS.
