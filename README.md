@@ -1,5 +1,5 @@
 # iRODS Library Examples
-The goal of this repository is to provide simple examples demonstrating how to use the new libraries available in iRODS v4.2.6.
+The goal of this repository is to provide simple examples demonstrating how to use the new libraries available in iRODS v4.2.6 and later.
 
 ### Table of Contents
 - [iRODS Query Iterator](#irods-query-iterator)
@@ -144,6 +144,8 @@ void iterating_over_collections()
     // Not all classes and functions require the use of these namespaces.
 
     try {
+        auto conn = // Our iRODS connection.
+
         // Here's an example of how to iterate over a collection on the client-side.
         // Notice how the "client" namespace follows the "fs" namespace alias.
         // This is required by some functions and classes to control which implementation
@@ -209,7 +211,7 @@ void write_to_data_object()
     // to only occur based on feedback from the community.
     namespace io = irods::experimental::io;
 
-    auto conn = // Our connection to iRODS.
+    auto conn = // Our iRODS connection.
 
     // Instantiates a new transport object which uses the iRODS protocol to read and
     // write bytes into a data object. Transport objects are designed to be used by IOStreams
@@ -247,7 +249,7 @@ void read_from_data_object()
 {
     namespace io = irods::experimental::io;
 
-    auto conn = // Our connection to iRODS.
+    auto conn = // Our iRODS connection.
 
     // See function above for information about this type.
     io::client::default_transport xport{conn};
@@ -301,15 +303,15 @@ void process_all_query_results()
         paths.push_back(_row[0] + '/' + _row[1]);
     }};
 
-    auto thread_pool = // Assume we have one of these.
-    auto conn = // Assume we have one of these.
+    auto thread_pool = // Our iRODS thread pool.
+    auto conn = // Our iRODS connection.
 
     // This is how we run the query. Notice how the execute call accepts a thread
     // pool and connection. This allows developers to run queries on different
     // thread pools.
     //
     // The object returned is a handle to a std::future containing error information.
-    // By doing this, the execution and handling of the query and it's results are done
+    // By doing this, the execution of the query and handling of it's results are done
     // asynchronously, therefore the application is not blocked from doing other work.
     auto errors = qproc.execute(thread_pool, conn);
 
