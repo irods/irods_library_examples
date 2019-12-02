@@ -3,6 +3,7 @@ The goal of this repository is to provide simple examples demonstrating how to u
 
 ### Table of Contents
 - [iRODS Query Iterator](#irods-query-iterator)
+- [iRODS Query Builder](#irods-query-builder)
 - [iRODS Connection Pool](#irods-connection-pool)
 - [iRODS Thread Pool](#irods-thread-pool)
 - [iRODS Filesystem](#irods-filesystem)
@@ -23,6 +24,66 @@ void print_all_resource_names(rcComm_t& _conn)
     for (auto&& row : irods::query<rcComm_t>{&_conn, "select RESC_NAME"}) {
         std::cout << row[0] << '\n';
     }
+}
+```
+
+## iRODS Query Builder
+Demonstrates how to construct query iterators via the query builder.
+```c++
+#include <irods/query_builder.hpp>
+
+#include <vector>
+
+void make_query()
+{
+    auto conn = // Our iRODS connection.
+
+    // Construct the builder.
+    // Builders can be copied and moved.
+    irods::experimental::query_builder builder; 
+
+    // Set the arguments for how the query should be constructed.
+    // A reference to the builder object is always returned after setting an argument.
+    //
+    // Here, we are setting the type of query to construct as well as the zone
+    // for which the query applies.
+    //
+    // The type always defaults to "general".
+    builder.type(irods::experimental::query_type::general)
+           .zone_hint("other_zone");
+
+    // To construct the query, call build and pass the C type of the connection and
+    // the SQL-like query statement.
+    //
+    // If the query string is empty, an exception will be thrown.
+    auto general_query = builder.build<rcComm_t>(conn, "select COLL_NAME");
+
+    // Use the query object as you normally would.
+    for (auto&& row : general_query) {
+        // Process results ...
+    }
+
+    // We can create more query objects using the same builder.
+    // Lets try a specific query!
+
+    // For specific queries, it is important to remember that the argument vector
+    // is not copied into the query object. This means the argument vector must live
+    // longer than the query object constructed by the builder.
+    std::vector<std::string> args{"/other_zone/home/rods"};
+
+    // All that is left is to update the builder options.
+    // The zone is already set from a previous call. So all that is left is to bind
+    // the arguments and change the query type.
+    auto specific_query = builder.type(irods::experimental::query_type::specific)
+                                 .bind_arguments(args)
+                                 .build<rcComm_t>(conn, "ShowCollAcls");
+
+    for (auto&& row : specific_query) {
+        // Process results ...
+    }
+
+    // Builders can also be reset to their original state by calling clear.
+    builder.clear();
 }
 ```
 
@@ -63,7 +124,21 @@ void init_connection_pool()
 
     // Here is an example of casting to a pointer.
     // Use this for C APIs.
-    auto* pointer = &static_cast<rcComm_t&>(conn);
+    auto* pointer = static_cast<rcComm_t*>(conn);
+
+    // You can also take ownership of connections created by the connection pool.
+    // Taking ownership means the connection is no longer managed by the connection pool
+    // and you are responsible for cleaning up any resources allocated by the connection.
+    // Once the connection is released, the connection pool will create a new connection
+    // in it's place.
+    auto* released_conn = conn.release();
+
+    // Because connections can be released from the pool, it makes sense to provide an
+    // operation for checking if the connection proxy still manages a valid connection.
+    // Connection objects are now convertible to bool.
+    if (conn) {
+        // Do something with the connection ...
+    }
 }
 ```
 
