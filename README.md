@@ -9,6 +9,8 @@ The goal of this repository is to provide simple examples demonstrating how to u
 - [iRODS Filesystem](#irods-filesystem)
 - [iRODS IOStreams](#irods-iostreams)
 - [iRODS Query Processor](#irods-query-processor)
+- [iRODS With Durability](#irods-with-durability)
+- [iRODS Key Value Proxy](#irods-key-value-proxy)
 
 ## iRODS Query Iterator
 Demonstrates how to use `irods::query` to query the catalog.
@@ -361,20 +363,28 @@ Demonstrates how to use `irods::query_processor`.
 
 #include <iostream>
 #include <vector>
+#include <mutex>
 
 void process_all_query_results()
 {
-    // This will hold all data object absolute paths found by the
-    // query processor.
+    // This will hold all data object absolute paths found by the query processor.
     std::vector<std::string> paths;
+
+    // Protects the paths vector from simultaneous updates.
+    std::mutex mtx;
 
     using query_processor = irods::query_processor<rcComm_t>;
 
     // This is where we create our query processor. As you can see, we pass it
-    // the query string as well as the handler. The handler takes in a single row
-    // (i.e. std::vector<std::string>) and creates a path using the results which
-    // are stored in the referenced "paths" container.
+    // the query string as well as the handler. The handler will process each row
+    // (i.e. std::vector<std::string>) asynchronously. This means that it is your
+    // responsibility to protect shared data if necessary.
+    //
+    // In the following example, the handler creates a path from "_row" and stores
+    // it in the referenced "paths" container. Notice how a mutex is acquired before
+    // adding the path to the container.
     query_processor qproc{"select COLL_NAME, DATA_NAME", [&paths](const auto& _row) {
+        std::lock_guard lk{mtx};
         paths.push_back(_row[0] + '/' + _row[1]);
     }};
 
@@ -390,7 +400,7 @@ void process_all_query_results()
     // asynchronously, therefore the application is not blocked from doing other work.
     auto errors = qproc.execute(thread_pool, conn);
 
-    // Becausing the errors are returned via a std::future, calling ".get()" will cause
+    // Because the errors are returned via a std::future, calling ".get()" will cause
     // the application to wait until all query results have been processed by the
     // handler provided on construction.
     for (auto&& error : errors.get()) {
@@ -403,3 +413,94 @@ void process_all_query_results()
     }
 }
 ```
+
+## iRODS With Durability
+Demonstrates how to use `irods::with_durability`.
+```c++
+#include <irods/with_durability.hpp>
+
+#include <irods/connection_pool.hpp>
+
+void get_collection_status_over_unreliabile_network()
+{
+    namespace ix = irods::experimental;
+    namespace fs = irods::experimental::filesystem;
+
+    // Holds the status of the collection.
+    fs::status s;
+
+    // This is where we define our rules for how durable we want a particular set of
+    // operations should be. Notice how we've set the number of retries and the delay
+    // multiplier. These options are completely optional. The last result will be
+    // returned to the call site. All intermediate results will be lost.
+    //
+    // The most imporant thing to understand about this function is the function-like
+    // object that will be invoked. It is up to the developer to instruct "with_durability"
+    // of when the set of operations have succeeded or failed, etc.
+    //
+    // See the following for more details:
+    //
+    //     https://github.com/irods/irods/blob/master/lib/core/include/with_durability.hpp
+    //
+    auto exec_result = ix::with_durability(ix::retries{5}, ix::delay_multiplier{2.f}, [&] {
+        try {
+            auto conn_pool = irods::make_connection_pool();
+            s = fs::client::status(conn_pool->get_connection(), "/tempZone/home/rods");
+            return ix::execution_result::success;
+        }
+        catch (const fs::filesystem_error&) {
+            return ix::execution_result::failure;
+        }
+
+        // Any exception that escapes the function-like object will be caught by the
+        // "with_durability" function.
+    });
+
+    // Here, we check the result of the operations and decide what should happen next. 
+    if (ix::execution_result::success != exec_result) {
+        // Handle failure.
+    }
+
+    // Print whether the collection exists.
+    std::cout << "Status of collection: " << fs::client::exists(s) << '\n';
+}
+```
+
+## iRODS Key Value Proxy
+Demonstrates how to use `irods::key_value_proxy`. If you're familiar with the associative
+containers provided by the C++ Std. library, then this new proxy class should feel very familiar.
+```c++
+#include <irods/key_value_proxy.hpp>
+
+#include <irods/dataObjOpen.h>
+#include <irods/stringOpr.h>
+
+#include <string>
+
+void manipulating_keyValuePair_t()
+{
+    // Let's open a replica for writing using the iRODS C API.
+    dataObjInp_t input{};
+    input.createMode = 0600;
+    input.openFlags = O_WRONLY;
+    rstrcpy(input.objPath, "/tempZone/home/rods/foo", MAX_NAME_LEN);
+
+    // Now, we need to set the options that target a specific replica.
+    // Normally we'd use the "keyValuePair_t" family of functions to add/remove
+    // options. Instead, we'll use the "key_value_proxy" class.
+    irods::experimental::key_value_proxy kvp{input.condInput};
+
+    // This proxy object does not own the underlying keyValuePair_t. It simply provides
+    // a map-like interface to manipulate and inspect it.
+
+    // Let's target a specific replica of this data object.
+    kvp[REPL_NUM_KW] = "2";
+
+    // We can also check if the kevValuePair_t contains a specific key.
+    kvp.contains(RESC_NAME_KW);
+
+    // Extracting a value is easy too.
+    const std::string value = kvp[RESC_HIER_STR_KW];
+}
+```
+
