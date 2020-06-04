@@ -467,8 +467,7 @@ void get_collection_status_over_unreliabile_network()
 ```
 
 ## iRODS Key Value Proxy
-Demonstrates how to use `irods::key_value_proxy`. If you're familiar with the associative
-containers provided by the C++ Std. library, then this new proxy class should feel very familiar.
+Demonstrates how to use `irods::key_value_proxy`.
 ```c++
 #include <irods/key_value_proxy.hpp>
 
@@ -494,10 +493,14 @@ void manipulating_keyValuePair_t()
     // a map-like interface to manipulate and inspect it.
 
     // Let's target a specific replica of this data object.
+    // This adds the "REPL_NUM_KW" key to the underlying keyValuePair_t and sets its
+    // value to the string "2". The string is copied into the object.
     kvp[REPL_NUM_KW] = "2";
 
-    // We can also check if the kevValuePair_t contains a specific key.
-    kvp.contains(RESC_NAME_KW);
+    // This proxy type also supports checking if the kevValuePair_t contains a specific key.
+    if (kvp.contains(RESC_NAME_KW)) {
+        // Do something ...
+    }
 
     // Extracting a value is easy too.
     const std::string value = kvp[RESC_HIER_STR_KW];
