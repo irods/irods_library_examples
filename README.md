@@ -1,5 +1,5 @@
 # iRODS Library Examples
-The goal of this repository is to provide simple examples demonstrating how to use the new libraries available in iRODS v4.2.6 and later.
+The goal of this repository is to provide simple examples demonstrating how to use the new libraries available in iRODS v4.3.0 and later.
 
 ### Table of Contents
 - [iRODS Query Iterator](#irods-query-iterator)
@@ -197,8 +197,8 @@ Demonstrates how to iterate over collections as well as other functionality.
 Because it implements the ISO C++17 Standard Filesystem library, you may use the documentation at [cppreference](https://cppreference.com).
 
 Here are some helpful links:
-- [iRODS Filesystem Headers](https://github.com/irods/irods/tree/4.2.6/lib/filesystem/include/filesystem)
-- [Most commonly used functions](https://github.com/irods/irods/tree/4.2.6/lib/filesystem/include/filesystem/filesystem.hpp)
+- [iRODS Filesystem Headers](https://github.com/irods/irods/blob/master/lib/filesystem/include/filesystem)
+- [Most commonly used functions](https://github.com/irods/irods/blob/master/lib/filesystem/include/filesystem/filesystem.hpp)
 ```c++
 // If you are writing server-side code and wish to enable the server-side API, you must
 // define the following macro before including the library.
@@ -297,7 +297,7 @@ void write_to_data_object()
     //
     // You can add support for more transport protocols by implementing the following interface:
     //
-    //     https://github.com/irods/irods/tree/4.2.6/lib/core/include/transport/transport.hpp
+    //     https://github.com/irods/irods/blob/master/lib/core/include/transport/transport.hpp
     //
     io::client::default_transport xport{conn};
 
