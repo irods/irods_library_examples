@@ -58,8 +58,8 @@ void make_query()
     builder.type(irods::experimental::query_type::general)
            .zone_hint("other_zone");
 
-    // To construct the query, call build and pass the C type of the connection and
-    // the SQL-like query statement.
+    // To construct the query, call build and pass the C type of
+    // the connection and the SQL-like query statement.
     //
     // If the query string is empty, an exception will be thrown.
     auto general_query = builder.build<rcComm_t>(conn, "select COLL_NAME");
@@ -70,7 +70,7 @@ void make_query()
     }
 
     // We can create more query objects using the same builder.
-    // Lets try a specific query!
+    // Let's try a specific query!
 
     // For specific queries, it is important to remember that the argument vector
     // is not copied into the query object. This means the argument vector must live
@@ -78,8 +78,8 @@ void make_query()
     std::vector<std::string> args{"/other_zone/home/rods"};
 
     // All that is left is to update the builder options.
-    // The zone is already set from a previous call. So all that is left is to bind
-    // the arguments and change the query type.
+    // The zone is already set from a previous call.
+    // So just bind the arguments and change the query type.
     auto specific_query = builder.type(irods::experimental::query_type::specific)
                                  .bind_arguments(args)
                                  .build<rcComm_t>(conn, "ShowCollAcls");
@@ -96,7 +96,7 @@ void make_query()
 ## iRODS Connection Pool
 Available Since: v4.2.5
 
-Demonstrates how easy it is to create a pool of connections.
+Demonstrates how to use `irods::connection_pool`.
 ```c++
 #include <irods/rodsClient.h>
 #include <irods/connection_pool.hpp>
@@ -145,7 +145,7 @@ void init_connection_pool()
     // Taking ownership means the connection is no longer managed by the connection pool
     // and you are responsible for cleaning up any resources allocated by the connection.
     // Once the connection is released, the connection pool will create a new connection
-    // in it's place.
+    // in its place.
     auto* released_conn = conn.release();
 
     // Because connections can be released from the pool, it makes sense to provide an
@@ -248,7 +248,7 @@ void iterating_over_collections()
             // Do something with the collection entry.
         }
 
-        // To recursively iterate over a collection and all of it's children, use a
+        // To recursively iterate over a collection and all of its children, use a
         // recursive iterator.
         for (auto&& e : fs::client::recursive_collection_iterator{conn, "/path/to/collection"}) {
             // Do something with the collection entry.
@@ -416,7 +416,7 @@ void process_all_query_results()
     // thread pools.
     //
     // The object returned is a handle to a std::future containing error information.
-    // By doing this, the execution of the query and handling of it's results are done
+    // By doing this, the execution of the query and handling of its results are done
     // asynchronously, therefore the application is not blocked from doing other work.
     auto errors = qproc.execute(thread_pool, conn);
 
@@ -456,7 +456,7 @@ void get_collection_status_over_unreliabile_network()
     // multiplier. These options are completely optional. The last result will be
     // returned to the call site. All intermediate results will be lost.
     //
-    // The most imporant thing to understand about this function is the function-like
+    // The most important thing to understand about this function is the function-like
     // object that will be invoked. It is up to the developer to instruct "with_durability"
     // of when the set of operations have succeeded or failed, etc.
     //
