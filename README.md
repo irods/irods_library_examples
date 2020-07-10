@@ -1,5 +1,5 @@
 # iRODS Library Examples
-The goal of this repository is to provide simple examples demonstrating how to use the new libraries available in iRODS v4.3.0 and later.
+The goal of this repository is to provide simple examples demonstrating how to use the new libraries available in iRODS.
 
 ### Table of Contents
 - [iRODS Query Iterator](#irods-query-iterator)
@@ -13,6 +13,8 @@ The goal of this repository is to provide simple examples demonstrating how to u
 - [iRODS Key Value Proxy](#irods-key-value-proxy)
 
 ## iRODS Query Iterator
+Available Since: v4.2.5
+
 Demonstrates how to use `irods::query` to query the catalog.
 ```c++
 #include <irods/irods_query.hpp>
@@ -30,6 +32,8 @@ void print_all_resource_names(rcComm_t& _conn)
 ```
 
 ## iRODS Query Builder
+Available Since: v4.2.7
+
 Demonstrates how to construct query iterators via the query builder.
 ```c++
 #include <irods/query_builder.hpp>
@@ -90,6 +94,8 @@ void make_query()
 ```
 
 ## iRODS Connection Pool
+Available Since: v4.2.5
+
 Demonstrates how easy it is to create a pool of connections.
 ```c++
 #include <irods/rodsClient.h>
@@ -114,6 +120,13 @@ void init_connection_pool()
                                 env.rodsUserName,
                                 env.rodsZone,
                                 refresh_time_in_secs};
+
+    // As an alternative to the steps above, you can use the following free
+    // function to construct a connection pool. This function simply automates
+    // all of the steps preceding this line. The primary difference is that the
+    // pool is allocated on the heap and is returned via a shared pointer.
+    //
+    //     auto pool = irods::make_connection_pool(4);
 
     // Get a connection from the pool.
     // "conn" is returned to the pool when it goes out of scope.
@@ -145,6 +158,8 @@ void init_connection_pool()
 ```
 
 ## iRODS Thread pool
+Available Since: v4.2.5
+
 Demonstrates how to use `irods::thread_pool`.
 ```c++
 #include <irods/thread_pool.hpp>
@@ -178,7 +193,6 @@ void schedule_task_on_thread_pool()
     // executed inside of the "post" call.
     irods::thread_pool::post(pool, task);
 
-    // Only available in 4.3.0.
     // This is just like "post" except, if the current thread belongs to the thread pool, then
     // the task is executed directly inside of the call to "dispatch".
     irods::thread_pool::dispatch(pool, [] {
@@ -193,6 +207,8 @@ void schedule_task_on_thread_pool()
 ```
 
 ## iRODS Filesystem
+Available Since: v4.2.6
+
 Demonstrates how to iterate over collections as well as other functionality.
 Because it implements the ISO C++17 Standard Filesystem library, you may use the documentation at [cppreference](https://cppreference.com).
 
@@ -261,6 +277,8 @@ void iterating_over_collections()
 ```
 
 ## iRODS IOStreams
+Available Since: v4.2.6
+
 Demonstrates how to use `dstream` and `default_transport` to read and write data objects.
 ```c++
 // Defines 3 classes:
@@ -357,6 +375,8 @@ void read_from_data_object()
 ```
 
 ## iRODS Query Processor
+Available Since: v4.2.6
+
 Demonstrates how to use `irods::query_processor`.
 ```c++
 #include <irods/query_processor.hpp>
@@ -415,6 +435,8 @@ void process_all_query_results()
 ```
 
 ## iRODS With Durability
+Available Since: v4.2.8
+
 Demonstrates how to use `irods::with_durability`.
 ```c++
 #include <irods/with_durability.hpp>
@@ -467,6 +489,8 @@ void get_collection_status_over_unreliabile_network()
 ```
 
 ## iRODS Key Value Proxy
+Available Since: v4.2.8
+
 Demonstrates how to use `irods::key_value_proxy`.
 ```c++
 #include <irods/key_value_proxy.hpp>
