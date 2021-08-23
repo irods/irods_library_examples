@@ -266,7 +266,7 @@ void iterating_over_collections()
         auto size = fs::client::data_object_size(conn, "/path/to/data_object");
 
         // Or checking if an object exists.
-        if (fs::exists(conn, path)) {
+        if (fs::client::exists(conn, path)) {
             // Do something with it.
         }
     }
